@@ -32,7 +32,7 @@ export function Home() {
     const dataKey = '@savepass:logins';
     // Save data on AsyncStorage and navigate to 'Home' screen
     const response = await AsyncStorage.getItem(dataKey);
-    const records = response ? JSON.parse(response) : [];
+    const records = JSON.parse(response) || [];
     // Get asyncStorage data, use setSearchListData and setData
     if(records){
       setData(records);
@@ -42,18 +42,25 @@ export function Home() {
 
   function handleFilterLoginData() {
     // Filter results inside data, save with setSearchListData
-    if(searchText != ''){
-      const searchListFromText = searchListData
-      .filter(pass => pass.service_name === searchText);
+    const filteredListFromText = searchListData
+    .filter(data =>{ 
+      const isValid = data.service_name
+      .toLocaleLowerCase()
+      .includes(searchText.toLocaleLowerCase());
 
-      setSearchListData(searchListFromText);
-    }else {
-      setSearchListData(data);
-    }
+      if(isValid){
+        return data;
+      }
+    });
+
+      setSearchListData(filteredListFromText);
   }
 
   function handleChangeInputText(text: string) {
     // Update searchText value
+    if(!text) {
+      setSearchListData(data);
+    }
     setSearchText(text);
   }
 
